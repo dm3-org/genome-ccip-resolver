@@ -1,19 +1,18 @@
-import {
-    PublicResolver
-} from '@ensdomains/ens-contracts';
+
 import { ethers } from 'ethers';
+
 import express from 'express';
-import { L2PublicResolver } from "../../typechain";
+import { PublicResolver, PublicResolver__factory } from "../../typechain";
 import { handleGenomeCcipRequest } from "./handleGenomeCcipRequest";
 
-export function EnsBedrockHandler(provider: ethers.providers.StaticJsonRpcProvider, l2ResolverAddress: string) {
-    const router = express.Router();
+export function GenomeHandler(provider: ethers.providers.StaticJsonRpcProvider, l2ResolverAddress: string) {
 
-    const l2PublicResolver = new ethers.Contract(
+    const router = express.Router();
+    const publicResolver = new ethers.Contract(
         l2ResolverAddress,
-        PublicResolver.abi,
+        PublicResolver__factory.abi,
         provider
-    ) as L2PublicResolver
+    ) as PublicResolver
 
     router.get(
         '/:resolverAddr/:calldata',
@@ -23,7 +22,7 @@ export function EnsBedrockHandler(provider: ethers.providers.StaticJsonRpcProvid
         ) => {
             const calldata = req.params.calldata.replace('.json', '');
             try {
-                const response = await handleGenomeCcipRequest(l2PublicResolver, calldata);
+                const response = await handleGenomeCcipRequest(publicResolver, calldata);
 
                 if (!response) {
                     return res.status(404).send({ message: `unsupported signature` });

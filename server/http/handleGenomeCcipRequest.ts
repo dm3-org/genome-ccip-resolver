@@ -3,6 +3,7 @@ import { getResolverInterface } from "../utils/getResolverInterface";
 import { Contract, ethers } from "ethers";
 import { decodeAddr } from "../profiles/addr/decodeAddr";
 import { decodeText } from "../profiles/text/decodeText";
+import { PublicResolver } from "typechain";
 
 
 function getEthersFormat(address: string) {
@@ -10,14 +11,15 @@ function getEthersFormat(address: string) {
 }
 
 
-export async function handleGenomeCcipRequest(PublicResolver: Contract, calldata: string) {
+export async function handleGenomeCcipRequest(PublicResolver: PublicResolver, calldata: string) {
     try {
         const l2Resolverinterface = getResolverInterface();
 
         //Parse the calldata returned by the contract
-        const [data] = l2Resolverinterface.parseTransaction({
+        const [name, data] = l2Resolverinterface.parseTransaction({
             data: calldata,
         }).args;
+
 
         const { signature, args } = l2Resolverinterface.parseTransaction({
             data,
@@ -36,6 +38,9 @@ export async function handleGenomeCcipRequest(PublicResolver: Contract, calldata
                 {
                     const { node } = decodeAddr(args);
                     const result = await PublicResolver["addr(bytes32)"](node)
+
+
+                    console.log(result)
 
                     return getEthersFormat(result)
                 }
