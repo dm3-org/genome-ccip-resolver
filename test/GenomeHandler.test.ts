@@ -51,10 +51,20 @@ describe("GenomeHandler", () => {
 
             expect(res.text).to.equal(ethers.utils.hexlify(alice.address));
         });
+        it("returns address zero if address is undefined", async () => {
+            const name = "alice.eth"
+            const node = ethers.utils.namehash(name)
+
+
+            const ccipRequest = getCcipRequest("addr(bytes32 node)", ethers.utils.dnsEncode(name), alice.address, node);
+            const res = await request(expressApp).get(`/${ethers.constants.AddressZero}/${ccipRequest}`).send();
+
+            expect(res.text).to.equal(ethers.constants.AddressZero);
+        });
     });
 
     describe("Text", () => {
-        it("resolves text", async () => {
+        it("returns text", async () => {
             const name = "alice.eth";
 
             const node = ethers.utils.namehash(name);
@@ -65,6 +75,16 @@ describe("GenomeHandler", () => {
             const res = await request(expressApp).get(`/${ethers.constants.AddressZero}/${ccipRequest}`).send();
 
             expect(res.text).to.equal(ethers.utils.defaultAbiCoder.encode(['string'], ["my-record-value"]));
+
+        });
+        it("resolves 0x if record not exist", async () => {
+            const name = "alice.eth";
+            const node = ethers.utils.namehash(name);
+
+            const ccipRequest = getCcipRequest("text", ethers.utils.dnsEncode(name), alice.address, node, "my-record");
+
+            const res = await request(expressApp).get(`/${ethers.constants.AddressZero}/${ccipRequest}`).send();
+            expect(res.text).to.equal(ethers.utils.defaultAbiCoder.encode(['string'], [""]));
 
         });
     });
