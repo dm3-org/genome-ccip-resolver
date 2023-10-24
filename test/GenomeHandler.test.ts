@@ -4,83 +4,70 @@ import { expect } from "chai";
 import express from "express";
 import { ethers } from "hardhat";
 import request from "supertest";
-import { L2PublicResolver } from "typechain";
+import { L2PublicResolver, PublicResolver } from "typechain";
 import { GenomeHandler } from "../server/http/GenomeHandler";
 import { BigNumber } from "ethers";
 import { getResolverInterface } from "../server/utils/getResolverInterface";
 import hre from 'hardhat';
+import { ETHBridgeAdapter } from "@eth-optimism/sdk";
+import { FakeContract, smock } from "@defi-wonderland/smock";
 
 describe("GenomeHandler", () => {
-    let l2PublicResolver: L2PublicResolver;
+
+    let ensRegistry: FakeContract;
+    let publicResolver: PublicResolver;
     let alice: SignerWithAddress;
     let bob: SignerWithAddress;
 
     let expressApp;
     beforeEach(async () => {
         [alice, bob] = await ethers.getSigners();
-        const l2PublicResolverFactory = await ethers.getContractFactory("PublicResolver");
-        l2PublicResolver = (await l2PublicResolverFactory.deploy()) as L2PublicResolver;
+
+        ensRegistry = (await smock.fake(
+            'SidRegistry',
+        )) as FakeContract;
+        ensRegistry.owner.whenCalledWith(ethers.utils.namehash('alice.eth')).returns(alice.address);
+
+        const PublicResolverFactory = await ethers.getContractFactory("PublicResolver");
+        publicResolver = (await PublicResolverFactory.deploy(
+            ensRegistry.address,
+            ethers.constants.AddressZero,
+            ethers.constants.Zero,
+        )) as PublicResolver;
         expressApp = express();
         expressApp.use(bodyParser.json());
-        expressApp.use(await GenomeHandler(ethers.provider, l2PublicResolver.address));
+        expressApp.use(await GenomeHandler(ethers.provider, publicResolver.address));
     });
 
     describe("Addr", () => {
-        it.only("resolves address", async () => {
-            const f = await hre.ethers.getContractFactory("spaceid-toolkit-contracts/contracts/resolvers/PublicResolver.sol")
-
-            console.log(f)
-            const name = ethers.utils.dnsEncode("alice.eth");
-            const dnsName = ethers.utils.dnsEncode(name);
+        it("resolves address", async () => {
+            const name = "alice.eth"
             const node = ethers.utils.namehash(name);
 
-            await l2PublicResolver.connect(alice)["setAddr(bytes,address)"](dnsName, alice.address);
+            await publicResolver.connect(alice)["setAddr(bytes32,address)"](node, alice.address);
 
-            const ccipRequest = getCcipRequest("addr(bytes32 node)", name, alice.address, node);
-
+            const ccipRequest = getCcipRequest("addr(bytes32 node)", ethers.utils.dnsEncode(name), alice.address, node);
             const res = await request(expressApp).get(`/${ethers.constants.AddressZero}/${ccipRequest}`).send();
-            const { slot, target } = res.body[1];
 
-            const slotValue = await ethers.provider.getStorageAt(target, slot);
-            expect(ethers.utils.getAddress(slotValue.substring(0, 42))).to.eq(alice.address);
+            expect(res.text).to.equal(ethers.utils.hexlify(alice.address));
         });
     });
 
     describe("Text", () => {
         it("resolves text", async () => {
-            const name = ethers.utils.dnsEncode("alice.eth");
-            const dnsName = ethers.utils.dnsEncode(name);
+            const name = "alice.eth";
+
             const node = ethers.utils.namehash(name);
 
-            await l2PublicResolver.connect(alice).setText(dnsName, "my-record", "my-record-value");
-            const ccipRequest = getCcipRequest("text", name, alice.address, node, "my-record");
+            await publicResolver.connect(alice).setText(node, "my-record", "my-record-value");
+            const ccipRequest = getCcipRequest("text", ethers.utils.dnsEncode(name), alice.address, node, "my-record");
 
             const res = await request(expressApp).get(`/${ethers.constants.AddressZero}/${ccipRequest}`).send();
-            const { slot, target } = res.body[1];
 
-            const slotValue = await ethers.provider.getStorageAt(target, slot);
+            expect(res.text).to.equal(ethers.utils.defaultAbiCoder.encode(['string'], ["my-record-value"]));
 
-            expect(ethers.utils.toUtf8String(slotValue.substring(0, 32))).to.equal("my-record-value");
         });
     });
-    describe("Version", () => {
-        it("resolves text", async () => {
-            const name = ethers.utils.dnsEncode("alice.eth");
-            const dnsName = ethers.utils.dnsEncode(name);
-            const node = ethers.utils.namehash(name);
-
-            await l2PublicResolver.connect(alice).clearRecords(dnsName);
-            const ccipRequest = getCcipRequest("text", name, alice.address, node, "my-record");
-
-            const res = await request(expressApp).get(`/${ethers.constants.AddressZero}/${ccipRequest}`).send();
-            const { slot, target } = res.body[0];
-
-            const slotValue = await ethers.provider.getStorageAt(target, slot);
-
-            expect(BigNumber.from(slotValue).toNumber()).to.equal(1);
-        });
-    })
-
 
 });
 

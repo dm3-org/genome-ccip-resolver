@@ -6,10 +6,6 @@ import { decodeText } from "../profiles/text/decodeText";
 import { PublicResolver } from "typechain";
 
 
-function getEthersFormat(address: string) {
-    return ethers.utils.hexlify(address);
-}
-
 
 export async function handleGenomeCcipRequest(PublicResolver: PublicResolver, calldata: string) {
     try {
@@ -32,22 +28,19 @@ export async function handleGenomeCcipRequest(PublicResolver: PublicResolver, ca
                     const { node, record } = decodeText(args);
                     const result = await PublicResolver.text(node, record)
 
-                    return getEthersFormat(result)
+                    return ethers.utils.defaultAbiCoder.encode(['string'], [result]);
                 }
             case "addr(bytes32)":
                 {
                     const { node } = decodeAddr(args);
                     const result = await PublicResolver["addr(bytes32)"](node)
 
-
-                    console.log(result)
-
-                    return getEthersFormat(result)
+                    return ethers.utils.hexlify(result);
                 }
             case "addr(bytes32,uint256)": {
                 const { node, coinType } = decodeAddr(args);
                 const result = await PublicResolver["addr(bytes32,uint256)"](node, coinType)
-                return getEthersFormat(result)
+                return ethers.utils.hexlify(result);
             }
             default:
                 //Unsupported signature

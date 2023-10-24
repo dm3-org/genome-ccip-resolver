@@ -25,10 +25,10 @@ export function GenomeHandler(provider: ethers.providers.StaticJsonRpcProvider, 
                 const response = await handleGenomeCcipRequest(publicResolver, calldata);
 
                 if (!response) {
-                    return res.status(404).send({ message: `unsupported signature` });
+                    return res.status(200).send("0x");
                 }
+                return res.status(200).send(response);
 
-                res.status(200).send(response);
             } catch (e) {
                 req.app.locals.logger.warn((e as Error).message);
                 res.status(400).send({ message: 'Unknown error' });
