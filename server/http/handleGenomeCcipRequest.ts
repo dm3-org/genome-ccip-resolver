@@ -7,7 +7,7 @@ import { PublicResolver } from "typechain";
 
 
 
-export async function handleGenomeCcipRequest(PublicResolver: PublicResolver, calldata: string) {
+export async function handleGenomeCcipRequest(publicResolver: PublicResolver, calldata: string) {
     try {
         const l2Resolverinterface = getResolverInterface();
 
@@ -26,20 +26,27 @@ export async function handleGenomeCcipRequest(PublicResolver: PublicResolver, ca
             case "text(bytes32,string)":
                 {
                     const { node, record } = decodeText(args);
-                    const result = await PublicResolver.text(node, record)
+                    const result = await publicResolver.text(node, record)
+
+                    return ethers.utils.defaultAbiCoder.encode(['string'], [result]);
+                }
+            case "name(bytes32)":
+                {
+                    const { node } = decodeText(args);
+                    const result = await publicResolver.name(node)
 
                     return ethers.utils.defaultAbiCoder.encode(['string'], [result]);
                 }
             case "addr(bytes32)":
                 {
                     const { node } = decodeAddr(args);
-                    const result = await PublicResolver["addr(bytes32)"](node)
+                    const result = await publicResolver["addr(bytes32)"](node)
 
                     return ethers.utils.hexlify(result);
                 }
             case "addr(bytes32,uint256)": {
                 const { node, coinType } = decodeAddr(args);
-                const result = await PublicResolver["addr(bytes32,uint256)"](node, coinType)
+                const result = await publicResolver["addr(bytes32,uint256)"](node, coinType)
                 return ethers.utils.hexlify(result);
             }
             default:

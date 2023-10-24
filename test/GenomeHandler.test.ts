@@ -88,6 +88,31 @@ describe("GenomeHandler", () => {
 
         });
     });
+    describe("Name", () => {
+        it("returns name", async () => {
+            const name = "alice.eth";
+
+            const node = ethers.utils.namehash(name);
+
+            await publicResolver.connect(alice).setName(node, "alice.eth");
+            const ccipRequest = getCcipRequest("name", ethers.utils.dnsEncode(name), alice.address, node);
+
+            const res = await request(expressApp).get(`/${ethers.constants.AddressZero}/${ccipRequest}`).send();
+
+            expect(res.text).to.equal(ethers.utils.defaultAbiCoder.encode(['string'], ["alice.eth"]));
+
+        });
+        it("resolves 0x if record not exist", async () => {
+            const name = "alice.eth";
+            const node = ethers.utils.namehash(name);
+
+            const ccipRequest = getCcipRequest("name", ethers.utils.dnsEncode(name), alice.address, node);
+
+            const res = await request(expressApp).get(`/${ethers.constants.AddressZero}/${ccipRequest}`).send();
+            expect(res.text).to.equal(ethers.utils.defaultAbiCoder.encode(['string'], [""]));
+
+        });
+    });
 
 });
 
