@@ -5,7 +5,7 @@ import { ethers } from 'ethers';
 import express from 'express';
 import http from 'http';
 import winston from 'winston';
-import { EnsBedrockHandler } from './http/EnsBedrockHandler';
+import { GenomeHandler } from './http/GenomeHandler';
 
 
 dotenv.config();
@@ -37,7 +37,7 @@ app.use(bodyParser.json());
     }
     const provider = new ethers.providers.StaticJsonRpcProvider(L2_PROVIDER_URL);
 
-    app.use('/', EnsBedrockHandler(provider, resolverAddress));
+    app.use('/', GenomeHandler(provider, resolverAddress));
 })();
 
 const port = '8887';

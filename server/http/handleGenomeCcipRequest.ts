@@ -1,9 +1,9 @@
 import { getResolverInterface } from "../utils/getResolverInterface";
 
-import { Contract, ethers } from "ethers";
+import { ethers } from "ethers";
 import { decodeAddr } from "../profiles/addr/decodeAddr";
 import { decodeText } from "../profiles/text/decodeText";
-import { PublicResolver } from "typechain";
+import { PublicResolver } from "./../../typechain";
 
 
 
