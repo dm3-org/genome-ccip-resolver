@@ -14,6 +14,7 @@ services:
         image: dm3org/ccip-resolver:v0.2.7
         restart: always
         environment:
+            SIGNER_PRIVATE_KEY: ${SIGNER_PRIVATE_KEY}
             CONFIG: |
                 {
                   "$ERC3668_RESOLVER_ADDRESS": {
