@@ -1,7 +1,7 @@
 version: "3.6"
 
 services:
-    ens-data-source:
+    genome-data-source:
         image: dm3org/genome-ccip-resolver:v0.0.1
         restart: always
         environment:
@@ -17,13 +17,9 @@ services:
             CONFIG: |
                 {
                   "$ERC3668_RESOLVER_ADDRESS": {
-                    "type": "optimism-bedrock",
-                    "handlerUrl": "http://ens-data-source:8887",
-                    "l1ProviderUrl": "$L1_PROVIDER_URL",
-                    "l2ProviderUrl": "$L2_PROVIDER_URL",
-                    "l1chainId": "5",
-                    "l2chainId": "$L2_CHAIN_ID"
-                  }
+                  "type": "signing",
+                  "handlerUrl": "http://genome-data-source:8887"
+                }
                 }
         ports:
             - "8081:8081"
