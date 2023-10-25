@@ -14,6 +14,10 @@ export function GenomeHandler(provider: ethers.providers.StaticJsonRpcProvider, 
         provider
     ) as PublicResolver
 
+    router.get("/helloGenome", async (req: express.Request, res: express.Response) => {
+        return await res.status(200).send("Hello Genome");
+    })
+
     router.get(
         '/:resolverAddr/:calldata',
         async (

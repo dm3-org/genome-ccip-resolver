@@ -1,8 +1,8 @@
 version: "3.6"
 
 services:
-    genome-data-source:
-        image: dm3org/genome-ccip-resolver:v0.0.1
+    genome-ccip-resolver:
+        image: dm3org/genome-ccip-resolver:v0.0.2
         restart: always
         environment:
             L2_PROVIDER_URL: "$L2_PROVIDER_URL"
@@ -18,7 +18,7 @@ services:
                 {
                   "$ERC3668_RESOLVER_ADDRESS": {
                   "type": "signing",
-                  "handlerUrl": "http://genome-data-source:8887"
+                  "handlerUrl": "http://genome-ccip-resolver:8887"
                 }
                 }
         ports:
