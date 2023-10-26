@@ -6,7 +6,7 @@ import { BigNumber } from "ethers";
 import { keccak256, RLP } from "ethers/lib/utils";
 import hre from 'hardhat';
 
-const NAMEWRAPPER_GOERLI = '0x114D4603199df73e7D157787f8778E21fCd13066';
+const NAMEWRAPPER = process.env.NAME_WRAPPER;
 const ENS_REGISTRY = process.env.ENS_REGISTRY;
 const DEFAULT_VERIFIER_URL = process.env.GATEWAY_URL;
 
@@ -30,7 +30,7 @@ async function main() {
         throw ("Must set SPACE_ID_REGISTRY, DEFAULT_VERIFIER_URL, RESOLVER_NAME, RESOLVER_CHAINID")
     }
 
-    const [deployer,signer] = await hre.ethers.getSigners();
+    const [deployer, signer] = await hre.ethers.getSigners();
     const nonce = await deployer.getTransactionCount();
 
     const resolverAddress =
@@ -66,7 +66,7 @@ async function main() {
         new ERC3668Resolver__factory()
             .connect(deployer)
             .deploy(
-                ENS_REGISTRY, NAMEWRAPPER_GOERLI, deploySignatureVerifier.address, [DEFAULT_VERIFIER_URL],
+                ENS_REGISTRY, NAMEWRAPPER, deploySignatureVerifier.address, [DEFAULT_VERIFIER_URL],
                 { gasLimit: 5000000, gasPrice: 50000000, nonce: nonce + 1 }
             );
 
