@@ -12,56 +12,26 @@ import "hardhat-storage-layout";
 import "hardhat-tracer";
 import { ethers } from "ethers";
 
-const OPTIMISTIC_ETHERSCAN_API_KEY = process.env.OPTIMISTIC_ETHERSCAN_API_KEY;
-const BASE_ETHERSCAN_API_KEY = process.env.BASE_ETHERSCAN_API_KEY;
-const GOERLI_ETHERSCAN_API_KEY = process.env.GOERLI_ETHERSCAN_API_KEY;
-
-const GOERLI_URL = process.env.L1_PROVIDER_URL ?? "";
 const DEPLOYER_PRIVATE_KEY = process.env.DEPLOYER_PRIVATE_KEY ?? ethers.Wallet.createRandom().privateKey;
+const SIGNER_PRIVATE_KEY = process.env.SIGNER_PRIVATE_KEY ?? ethers.Wallet.createRandom().privateKey;
+
+const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY;
+
+const L1_PROVIDER_URL = process.env.L1_PROVIDER_URL;
 
 module.exports = {
     defaultNetwork: "hardhat",
     networks: {
-        optimismGoerli: {
-            url: "https://goerli.optimism.io",
-            accounts: [DEPLOYER_PRIVATE_KEY],
-        },
-        baseGoerli: {
-            url: "https://goerli.base.org",
-            accounts: [DEPLOYER_PRIVATE_KEY],
-        },
         goerli: {
-            url: GOERLI_URL,
-            accounts: [DEPLOYER_PRIVATE_KEY],
+            url: L1_PROVIDER_URL,
+            accounts: [DEPLOYER_PRIVATE_KEY, SIGNER_PRIVATE_KEY],
         },
+
         localhost: {},
 
     },
     etherscan: {
-        apiKey: {
-            optimismGoerli: OPTIMISTIC_ETHERSCAN_API_KEY,
-            baseGoerli: BASE_ETHERSCAN_API_KEY,
-            goerli: GOERLI_ETHERSCAN_API_KEY
-        },
-        customChains: [
-            {
-                network: "optimismGoerli",
-                chainId: 420,
-                urls: {
-                    apiURL: "https://api-goerli-optimism.etherscan.io/api",
-                    browserURL: "https://goerli-optimism.etherscan.io"
-                }
-            },
-            {
-                network: "baseGoerli",
-                chainId: 84531,
-                urls: {
-                    browserURL: "https://goerli.basescan.org",
-                    apiURL: "https://api-goerli.basescan.org/api",
-                }
-            }
-        ]
-
+        apiKey: ETHERSCAN_API_KEY
     },
     namedAccounts: {
         deployer: {
@@ -76,7 +46,6 @@ module.exports = {
                     viaIR: true,
                     optimizer: {
                         enabled: true,
-                        
                         details: {
                             yulDetails: {
                                 optimizerSteps: 'u',
