@@ -17,7 +17,7 @@ export function GenomeHandler(provider: ethers.providers.StaticJsonRpcProvider, 
     router.get("/helloGenome", async (req: express.Request, res: express.Response) => {
         return await res.status(200).send("Hello Genome");
     })
-
+ 
     router.get(
         '/:resolverAddr/:calldata',
         async (
@@ -27,6 +27,7 @@ export function GenomeHandler(provider: ethers.providers.StaticJsonRpcProvider, 
             const calldata = req.params.calldata.replace('.json', '');
             try {
                 const response = await handleGenomeCcipRequest(publicResolver, calldata);
+                console.log("handler response", response);
 
                 if (!response) {
                     return res.status(200).send("0x");

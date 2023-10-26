@@ -1,16 +1,13 @@
+import { FakeContract, smock } from "@defi-wonderland/smock";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import bodyParser from "body-parser";
 import { expect } from "chai";
 import express from "express";
 import { ethers } from "hardhat";
 import request from "supertest";
-import { L2PublicResolver, PublicResolver } from "typechain";
+import { PublicResolver } from "typechain";
 import { GenomeHandler } from "../server/http/GenomeHandler";
-import { BigNumber } from "ethers";
 import { getResolverInterface } from "../server/utils/getResolverInterface";
-import hre from 'hardhat';
-import { ETHBridgeAdapter } from "@eth-optimism/sdk";
-import { FakeContract, smock } from "@defi-wonderland/smock";
 
 describe("GenomeHandler", () => {
 
@@ -26,7 +23,7 @@ describe("GenomeHandler", () => {
         ensRegistry = (await smock.fake(
             'SidRegistry',
         )) as FakeContract;
-        ensRegistry.owner.whenCalledWith(ethers.utils.namehash('alice.eth')).returns(alice.address);
+        ensRegistry.owner.whenCalledWith(ethers.utils.namehash('alice.gno')).returns(alice.address);
 
         const PublicResolverFactory = await ethers.getContractFactory("PublicResolver");
         publicResolver = (await PublicResolverFactory.deploy(
@@ -41,13 +38,34 @@ describe("GenomeHandler", () => {
 
     describe("Addr", () => {
         it("resolves address", async () => {
-            const name = "alice.eth"
-            const node = ethers.utils.namehash(name);
+            const l2name = "alice.gno"
+            const l2node = ethers.utils.namehash(l2name);
 
-            await publicResolver.connect(alice)["setAddr(bytes32,address)"](node, alice.address);
+            const l1name = "alice.gno.eth"
+            const l1node = ethers.utils.namehash(l1name);
 
-            const ccipRequest = getCcipRequest("addr(bytes32 node)", ethers.utils.dnsEncode(name), alice.address, node);
+
+            await publicResolver.connect(alice)["setAddr(bytes32,address)"](l2node, alice.address);
+
+            const ccipRequest = getCcipRequest("addr(bytes32 node)", ethers.utils.dnsEncode(l1name), alice.address, l1node);
             const res = await request(expressApp).get(`/${ethers.constants.AddressZero}/${ccipRequest}`).send();
+
+
+            expect(res.text).to.equal(ethers.utils.hexlify(alice.address));
+        });
+        it("resolves address without eth postfix too", async () => {
+            const l2name = "alice.gno"
+            const l2node = ethers.utils.namehash(l2name);
+
+            const l1name = "alice.gno"
+            const l1node = ethers.utils.namehash(l1name);
+
+
+            await publicResolver.connect(alice)["setAddr(bytes32,address)"](l2node, alice.address);
+
+            const ccipRequest = getCcipRequest("addr(bytes32 node)", ethers.utils.dnsEncode(l1name), alice.address, l1node);
+            const res = await request(expressApp).get(`/${ethers.constants.AddressZero}/${ccipRequest}`).send();
+
 
             expect(res.text).to.equal(ethers.utils.hexlify(alice.address));
         });
@@ -55,8 +73,10 @@ describe("GenomeHandler", () => {
             const name = "alice.eth"
             const node = ethers.utils.namehash(name)
 
+            const addr = "0xfCe863E8390B83014663464616E4668fbcdf0069"
 
             const ccipRequest = getCcipRequest("addr(bytes32 node)", ethers.utils.dnsEncode(name), alice.address, node);
+            console.log(`/${addr}/${ccipRequest}`)
             const res = await request(expressApp).get(`/${ethers.constants.AddressZero}/${ccipRequest}`).send();
 
             expect(res.text).to.equal(ethers.constants.AddressZero);
@@ -65,12 +85,29 @@ describe("GenomeHandler", () => {
 
     describe("Text", () => {
         it("returns text", async () => {
-            const name = "alice.eth";
+            const l2name = "alice.gno"
+            const l2node = ethers.utils.namehash(l2name);
 
-            const node = ethers.utils.namehash(name);
+            const l1name = "alice.gno.eth"
+            const l1node = ethers.utils.namehash(l1name);
 
-            await publicResolver.connect(alice).setText(node, "my-record", "my-record-value");
-            const ccipRequest = getCcipRequest("text", ethers.utils.dnsEncode(name), alice.address, node, "my-record");
+            await publicResolver.connect(alice).setText(l2node, "my-record", "my-record-value");
+            const ccipRequest = getCcipRequest("text", ethers.utils.dnsEncode(l1name), alice.address, l1node, "my-record");
+
+            const res = await request(expressApp).get(`/${ethers.constants.AddressZero}/${ccipRequest}`).send();
+
+            expect(res.text).to.equal(ethers.utils.defaultAbiCoder.encode(['string'], ["my-record-value"]));
+
+        });
+        it("returns text without eth postfix too ", async () => {
+            const l2name = "alice.gno"
+            const l2node = ethers.utils.namehash(l2name);
+
+            const l1name = "alice.gno"
+            const l1node = ethers.utils.namehash(l1name);
+
+            await publicResolver.connect(alice).setText(l2node, "my-record", "my-record-value");
+            const ccipRequest = getCcipRequest("text", ethers.utils.dnsEncode(l1name), alice.address, l1node, "my-record");
 
             const res = await request(expressApp).get(`/${ethers.constants.AddressZero}/${ccipRequest}`).send();
 
@@ -90,12 +127,29 @@ describe("GenomeHandler", () => {
     });
     describe("Name", () => {
         it("returns name", async () => {
-            const name = "alice.eth";
+            const l2name = "alice.gno"
+            const l2node = ethers.utils.namehash(l2name);
 
-            const node = ethers.utils.namehash(name);
+            const l1name = "alice.gno.eth"
+            const l1node = ethers.utils.namehash(l1name);
 
-            await publicResolver.connect(alice).setName(node, "alice.eth");
-            const ccipRequest = getCcipRequest("name", ethers.utils.dnsEncode(name), alice.address, node);
+            await publicResolver.connect(alice).setName(l2node, "alice.eth");
+            const ccipRequest = getCcipRequest("name", ethers.utils.dnsEncode(l1name), alice.address, l1node);
+
+            const res = await request(expressApp).get(`/${ethers.constants.AddressZero}/${ccipRequest}`).send();
+
+            expect(res.text).to.equal(ethers.utils.defaultAbiCoder.encode(['string'], ["alice.eth"]));
+
+        });
+        it("returns name without eth postfix too", async () => {
+            const l2name = "alice.gno"
+            const l2node = ethers.utils.namehash(l2name);
+
+            const l1name = "alice.gno"
+            const l1node = ethers.utils.namehash(l1name);
+
+            await publicResolver.connect(alice).setName(l2node, "alice.eth");
+            const ccipRequest = getCcipRequest("name", ethers.utils.dnsEncode(l1name), alice.address, l1node);
 
             const res = await request(expressApp).get(`/${ethers.constants.AddressZero}/${ccipRequest}`).send();
 
