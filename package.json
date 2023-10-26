@@ -3,20 +3,17 @@
   "version": "0.2.0",
   "description": "",
   "scripts": {
-    "debug": "npx hardhat test ",
+    "debug": "npx hardhat run  scripts/getAddr.ts",
     "compile": "hardhat compile",
     "test": "hardhat test ",
     "lint:fix": "prettier --write 'scripts/**/*.{js,ts}' 'test/**/*.{js,ts}' 'tasks/**/*.{js,ts}' && tslint --fix --config tslint.json --project tsconfig.json && solhint contracts/**/*.sol",
     "lint": "tslint --config tslint.json --project tsconfig.json && solhint contracts/**/*.sol",
     "format": "prettier --check \"**/*.{ts,js,sol}\"",
     "format:fix": "prettier --write \"**/*.{ts,js,sol}\"",
-    "build": "yarn hardhat compile && yarn tsc -p tsconfig-build.json",
+    "build": "yarn hardhat compile && yarn tsc -p tsconfig-build.json --skipLibCheck",
     "dev": " node dist/server/index.js",
     "docker:build": "docker build -t genome-ccip-resolver -f ./Dockerfile .",
-    "deploy:l1-proof-verifier": "npx hardhat run ./deploy/l1/00_BedrockProofVerifier.ts",
-    "deploy:l2-resolver": "npx hardhat run deploy/l2/01_L2Public_Resolver.ts",
-    "deploy:l1-resolver-verifier": "npx hardhat run ./deploy/l1/01_L2Public_Resolver_Verifier.ts",
-    "deploy:l1-resolver": "npx hardhat run ./deploy/l1/02_ERC3668_Resolver.ts",
+    "deploy:l1-resolver-goerli": "npx hardhat run ./deploy/01_ERC3668_Resolver.ts --network goerli",
     "start": "docker compose up -d "
   },
   "files": [
@@ -73,7 +70,7 @@
     "tslint-config-prettier": "^1.18.0",
     "tslint-plugin-prettier": "^2.3.0",
     "typechain": "^6.0.5",
-    "typescript": "^4.5.3",
+    "typescript": "^ 5.2.2",
     "web3": "^1.6.1"
   },
   "mocha": {
@@ -83,13 +80,14 @@
     "@defi-wonderland/smock": "^2.3.4",
     "@ensdomains/buffer": "0.0.10",
     "@ensdomains/dnssec-oracle": "0.1.2",
-"@ensdomains/ens-contracts": "^0.0.19",
+    "@ensdomains/ens-contracts": "^0.0.19",
     "@eth-optimism/contracts": "^0.5.40",
     "@eth-optimism/sdk": "^2.0.2",
     "ccip-resolver": "^0.2.7",
     "cors": "^2.8.5",
     "express": "^4.18.2",
     "solidity-bytes-utils": "^0.8.0",
+    "viem": "^1.17.1",
     "winston": "^3.9.0"
   }
 }
