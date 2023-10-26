@@ -8,6 +8,7 @@ import request from "supertest";
 import { PublicResolver } from "typechain";
 import { GenomeHandler } from "../server/http/GenomeHandler";
 import { getResolverInterface } from "../server/utils/getResolverInterface";
+import { getSpaceIdNode } from "../server/utils/spaceIDNode";
 
 describe("GenomeHandler", () => {
 
@@ -23,7 +24,7 @@ describe("GenomeHandler", () => {
         ensRegistry = (await smock.fake(
             'SidRegistry',
         )) as FakeContract;
-        ensRegistry.owner.whenCalledWith(ethers.utils.namehash('alice.gno')).returns(alice.address);
+        ensRegistry.owner.whenCalledWith(getSpaceIdNode('alice.gno')).returns(alice.address);
 
         const PublicResolverFactory = await ethers.getContractFactory("PublicResolver");
         publicResolver = (await PublicResolverFactory.deploy(
@@ -39,10 +40,12 @@ describe("GenomeHandler", () => {
     describe("Addr", () => {
         it("resolves address", async () => {
             const l2name = "alice.gno"
-            const l2node = ethers.utils.namehash(l2name);
+            const l2node = getSpaceIdNode(l2name);
 
             const l1name = "alice.gno.eth"
             const l1node = ethers.utils.namehash(l1name);
+
+            console.log(ethers.utils.namehash("alice.gno"))
 
 
             await publicResolver.connect(alice)["setAddr(bytes32,address)"](l2node, alice.address);
@@ -55,7 +58,7 @@ describe("GenomeHandler", () => {
         });
         it("resolves address without eth postfix too", async () => {
             const l2name = "alice.gno"
-            const l2node = ethers.utils.namehash(l2name);
+            const l2node = getSpaceIdNode(l2name);
 
             const l1name = "alice.gno"
             const l1node = ethers.utils.namehash(l1name);
@@ -71,7 +74,7 @@ describe("GenomeHandler", () => {
         });
         it("returns address zero if address is undefined", async () => {
             const name = "alice.eth"
-            const node = ethers.utils.namehash(name)
+            const node = getSpaceIdNode(name)
 
             const addr = "0xfCe863E8390B83014663464616E4668fbcdf0069"
 
@@ -86,7 +89,7 @@ describe("GenomeHandler", () => {
     describe("Text", () => {
         it("returns text", async () => {
             const l2name = "alice.gno"
-            const l2node = ethers.utils.namehash(l2name);
+            const l2node = getSpaceIdNode(l2name);
 
             const l1name = "alice.gno.eth"
             const l1node = ethers.utils.namehash(l1name);
@@ -101,7 +104,7 @@ describe("GenomeHandler", () => {
         });
         it("returns text without eth postfix too ", async () => {
             const l2name = "alice.gno"
-            const l2node = ethers.utils.namehash(l2name);
+            const l2node = getSpaceIdNode(l2name);
 
             const l1name = "alice.gno"
             const l1node = ethers.utils.namehash(l1name);
@@ -128,7 +131,7 @@ describe("GenomeHandler", () => {
     describe("Name", () => {
         it("returns name", async () => {
             const l2name = "alice.gno"
-            const l2node = ethers.utils.namehash(l2name);
+            const l2node = getSpaceIdNode(l2name);
 
             const l1name = "alice.gno.eth"
             const l1node = ethers.utils.namehash(l1name);
@@ -143,7 +146,7 @@ describe("GenomeHandler", () => {
         });
         it("returns name without eth postfix too", async () => {
             const l2name = "alice.gno"
-            const l2node = ethers.utils.namehash(l2name);
+            const l2node = getSpaceIdNode(l2name);
 
             const l1name = "alice.gno"
             const l1node = ethers.utils.namehash(l1name);

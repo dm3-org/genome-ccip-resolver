@@ -5,10 +5,7 @@ export function trimEthLabel(name: string): string {
     const dnsDecoded = dnsDecode(ethers.utils.toUtf8String(name));
     const ethLabel = ".eth"
 
-    const nameWithLabel = dnsDecoded.replace(ethLabel, "")
-
-    return ethers.utils.namehash(nameWithLabel);
-
+    return dnsDecoded.replace(ethLabel, "")
 }
 
 function dnsDecode(encodedName: string): string {

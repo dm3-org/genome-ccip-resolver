@@ -5,6 +5,7 @@ import { decodeAddr } from "../profiles/addr/decodeAddr";
 import { decodeText } from "../profiles/text/decodeText";
 import { trimEthLabel } from "../utils/trimEthLabel";
 import { PublicResolver } from "./../../typechain";
+import { getSpaceIdNode } from "../utils/spaceIDNode";
 
 
 
@@ -27,32 +28,29 @@ export async function handleGenomeCcipRequest(publicResolver: PublicResolver, ca
         //foo.gno.eth => foo.gno
         const nodeWithoutEth = trimEthLabel(name);
 
+        //Space Id has a different naming style we need to handle
+        const spaceIdNode = getSpaceIdNode(nodeWithoutEth)
+
         switch (signature) {
             case "text(bytes32,string)":
                 {
                     const { record } = decodeText(args);
-                    const result = await publicResolver.text(nodeWithoutEth, record)
-
-                    console.log("text result", result);
+                    const result = await publicResolver.text(spaceIdNode, record)
                     return ethers.utils.defaultAbiCoder.encode(['string'], [result]);
                 }
             case "name(bytes32)":
                 {
-                    const result = await publicResolver.name(nodeWithoutEth)
-                    console.log("name result", result);
+                    const result = await publicResolver.name(spaceIdNode)
                     return ethers.utils.defaultAbiCoder.encode(['string'], [result]);
                 }
             case "addr(bytes32)":
                 {
-                    const result = await publicResolver["addr(bytes32)"](nodeWithoutEth)
-
-                    console.log("addr result", result);
-
+                    const result = await publicResolver["addr(bytes32)"](spaceIdNode)
                     return ethers.utils.hexlify(result);
                 }
             case "addr(bytes32,uint256)": {
                 const { coinType } = decodeAddr(args);
-                const result = await publicResolver["addr(bytes32,uint256)"](nodeWithoutEth, coinType)
+                const result = await publicResolver["addr(bytes32,uint256)"](spaceIdNode, coinType)
                 return ethers.utils.hexlify(result);
             }
             default:
