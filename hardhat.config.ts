@@ -26,6 +26,10 @@ module.exports = {
             url: L1_PROVIDER_URL,
             accounts: [DEPLOYER_PRIVATE_KEY, SIGNER_PRIVATE_KEY],
         },
+        mainnet: {
+            url: L1_PROVIDER_URL,
+            accounts: [DEPLOYER_PRIVATE_KEY, SIGNER_PRIVATE_KEY],
+        },
 
         localhost: {},
 

@@ -14,6 +14,7 @@
     "dev": " node dist/server/index.js",
     "docker:build": "docker build -t genome-ccip-resolver -f ./Dockerfile .",
     "deploy:l1-resolver-goerli": "npx hardhat run ./deploy/01_ERC3668_Resolver.ts --network goerli",
+    "deploy:l1-resolver-mainnet": "npx hardhat run ./deploy/01_ERC3668_Resolver.ts --network mainnet",
     "start": "docker compose up -d "
   },
   "files": [

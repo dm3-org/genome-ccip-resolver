@@ -21,6 +21,7 @@ After you've set up the environment, you can execute the test suite using ```yar
 ## Deploy Contracts
 There is a script that deploys the contract needed for the resolver on Goerli.
 Simply run ```yarn deploy:l1-resolver-goerli``` to deploy them. 
+For the mainnet deployment run ```yarn deploy:l1-resolver-mainnet```
 
 ## Deploy Gateway
 The docker-compose.yml contains everything you need to deploy the gateway. Simply run docker-compose up after you've set up the environment
