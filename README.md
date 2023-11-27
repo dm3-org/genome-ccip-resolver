@@ -26,7 +26,7 @@ For the mainnet deployment run ```yarn deploy:l1-resolver-mainnet```
 ## Deploy Gateway
 The docker-compose.yml contains everything you need to deploy the gateway. Simply run docker-compose up after you've set up the environment
 
-## Addresses
+## Deployments
 
 ### Goerli
 **SignatureCcipVerifier** : 0xaf23aEd91a9f68309d4A21752b1555526156EA8c  
