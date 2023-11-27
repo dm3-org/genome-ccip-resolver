@@ -29,5 +29,10 @@ The docker-compose.yml contains everything you need to deploy the gateway. Simpl
 ## Addresses
 
 ### Goerli
-SignatureCcipVerifier : 0xaf23aEd91a9f68309d4A21752b1555526156EA8c
-ERC3668Resolver : 0x26139B2349282dE5EE2BD9C7a53171A28D6a6c84
+**SignatureCcipVerifier** : 0xaf23aEd91a9f68309d4A21752b1555526156EA8c  
+**ERC3668Resolver** : 0x26139B2349282dE5EE2BD9C7a53171A28D6a6c84
+
+### Ethereum Mainnet 
+**SignatureCcipVerifier** : 0xfbbc1e3f42ebd9e80919913271ed2fae922e26d8  
+**ERC3668Resolver** : 0xc9bf092673b3a066df088a2a911e23e9b69b82f2
+
