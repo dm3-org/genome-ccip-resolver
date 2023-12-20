@@ -42,7 +42,25 @@ describe("GenomeHandler", () => {
             const l2name = "alice.gno"
             const l2node = getSpaceIdNode(l2name);
 
-            const l1name = "alice.gno.eth"
+            const l1name = "alice.gnos.eth"
+            const l1node = ethers.utils.namehash(l1name);
+
+            console.log(ethers.utils.namehash("alice.gno"))
+
+
+            await publicResolver.connect(alice)["setAddr(bytes32,address)"](l2node, alice.address);
+
+            const ccipRequest = getCcipRequest("addr(bytes32 node)", ethers.utils.dnsEncode(l1name), alice.address, l1node);
+            const res = await request(expressApp).get(`/${ethers.constants.AddressZero}/${ccipRequest}`).send();
+
+
+            expect(res.text).to.equal(ethers.utils.hexlify(alice.address));
+        });
+        it("resolves gnosis address", async () => {
+            const l2name = "alice.gno"
+            const l2node = getSpaceIdNode(l2name);
+
+            const l1name = "alice.gnosis.eth"
             const l1node = ethers.utils.namehash(l1name);
 
             console.log(ethers.utils.namehash("alice.gno"))
@@ -60,7 +78,7 @@ describe("GenomeHandler", () => {
             const l2name = "alice.gno"
             const l2node = getSpaceIdNode(l2name);
 
-            const l1name = "alice.gno"
+            const l1name = "alice.gnos"
             const l1node = ethers.utils.namehash(l1name);
 
 
@@ -91,7 +109,7 @@ describe("GenomeHandler", () => {
             const l2name = "alice.gno"
             const l2node = getSpaceIdNode(l2name);
 
-            const l1name = "alice.gno.eth"
+            const l1name = "alice.gnos.eth"
             const l1node = ethers.utils.namehash(l1name);
 
             await publicResolver.connect(alice).setText(l2node, "my-record", "my-record-value");
@@ -106,7 +124,7 @@ describe("GenomeHandler", () => {
             const l2name = "alice.gno"
             const l2node = getSpaceIdNode(l2name);
 
-            const l1name = "alice.gno"
+            const l1name = "alice.gnos"
             const l1node = ethers.utils.namehash(l1name);
 
             await publicResolver.connect(alice).setText(l2node, "my-record", "my-record-value");
@@ -133,7 +151,7 @@ describe("GenomeHandler", () => {
             const l2name = "alice.gno"
             const l2node = getSpaceIdNode(l2name);
 
-            const l1name = "alice.gno.eth"
+            const l1name = "alice.gnos.eth"
             const l1node = ethers.utils.namehash(l1name);
 
             await publicResolver.connect(alice).setName(l2node, "alice.eth");
@@ -148,7 +166,7 @@ describe("GenomeHandler", () => {
             const l2name = "alice.gno"
             const l2node = getSpaceIdNode(l2name);
 
-            const l1name = "alice.gno"
+            const l1name = "alice.gnos"
             const l1node = ethers.utils.namehash(l1name);
 
             await publicResolver.connect(alice).setName(l2node, "alice.eth");

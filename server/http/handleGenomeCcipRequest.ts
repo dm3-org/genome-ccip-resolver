@@ -6,6 +6,7 @@ import { decodeText } from "../profiles/text/decodeText";
 import { trimEthLabel } from "../utils/trimEthLabel";
 import { PublicResolver } from "./../../typechain";
 import { getSpaceIdNode } from "../utils/spaceIDNode";
+import { replaceL1Label } from "../utils/replaceL1Label";
 
 
 
@@ -28,8 +29,11 @@ export async function handleGenomeCcipRequest(publicResolver: PublicResolver, ca
         //foo.gno.eth => foo.gno
         const nodeWithoutEth = trimEthLabel(name);
 
+        //The label that on L1 would be the namespace of genome (in production it is .gnosis.eth) will be replaced to the genome namespace (.gno)
+        const nodeWithL1Label = replaceL1Label(nodeWithoutEth)
+
         //Space Id has a different naming style we need to handle
-        const spaceIdNode = getSpaceIdNode(nodeWithoutEth)
+        const spaceIdNode = getSpaceIdNode(nodeWithL1Label)
 
         switch (signature) {
             case "text(bytes32,string)":
