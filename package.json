@@ -1,6 +1,6 @@
 {
-  "name": "ens_bedrock_resolver",
-  "version": "0.2.0",
+  "name": "genome-ccip-resolver",
+  "version": "0.0.7",
   "description": "",
   "scripts": {
     "debug": "npx hardhat run  scripts/getAddr.ts",
