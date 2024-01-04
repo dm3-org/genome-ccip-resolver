@@ -1,6 +1,6 @@
 {
   "name": "genome-ccip-resolver",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "",
   "scripts": {
     "debug": "npx hardhat run  scripts/getAddr.ts",
